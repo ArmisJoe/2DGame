@@ -6,7 +6,6 @@
 #include "Window.h"
 #include "Audio.h"
 #include "CutSceneManager.h"
-#include "Video.h"
 #include "Fonts.h"
 #include "FogOfWar.h"
 
@@ -145,12 +144,6 @@ bool MenuScene::PreUpdate()
 
 bool MenuScene::Update(float dt)
 {
-	if (App->video->want_to_play == false)
-	{
-		uint w, h;
-		App->win->GetWindowSize(w, h);
-		App->video->PlayVideo("VideoLogoNemesis.ogv");
-	}
 
 	// --------------------------------------------
 	//						UI
