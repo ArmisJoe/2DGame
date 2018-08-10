@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<config>
+	<app framerate_cap="">
+		<title>Age Of The Ring</title>
+		<organization>Nemesis Studio</organization>
+	</app>
+	<renderer>
+		<vsync value="true" />
+	</renderer>
+	<font>
+		<default_font file="fonts/open_sans/times.ttf" size="14" />
+	</font>
+	<gui>
+		<atlas file="gui/atlas.png" />
+	</gui>
+	<window>
+		<resolution width="1280" height="720" scale="1" />
+		<fullscreen value="false" />
+		<borderless value="false" />
+		<resizable value="false" />
+		<fullscreen_window value="false" />
+	</window>
+	<file_system>
+		<path>data.zip</path>
+	</file_system>
+	<map>
+		<folder>maps/</folder>
+	</map>
+        <fog>
+               <texture file1="maps/FOW.png" file2="maps/FOW2.png"/>
+        </fog>
+        <quest>
+               <data file="quests/questData.xml"/>
+        </quest>
+     	<input>
+               <shortcuts select_units="Q" select_villagers="W" restart_camera="E" hero_attack="SPACE" />
+        </input>
+</config>

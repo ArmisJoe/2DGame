@@ -1,0 +1,316 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="PugiXml\src\pugixml.cpp">
+      <Filter>Project 2\Tools\PuguiXML</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Fonts.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Pathfinding.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Textures.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Project 2\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Project 2</Filter>
+    </ClCompile>
+    <ClCompile Include="PerfTimer.cpp">
+      <Filter>Project 2\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Project 2\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="p2Log.cpp">
+      <Filter>Project 2</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Project 2</Filter>
+    </ClCompile>
+    <ClCompile Include="Unit.cpp">
+      <Filter>Project 2\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityManager.cpp">
+      <Filter>Project 2\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Project 2\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Building.cpp">
+      <Filter>Project 2\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="FogOfWar.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource.cpp">
+      <Filter>Project 2\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuScene.cpp">
+      <Filter>Project 2\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Project 2\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Villager.cpp">
+      <Filter>Project 2\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Hero.cpp">
+      <Filter>Project 2\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleManager.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Minimap.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="QuestManager.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="TechTree.cpp">
+      <Filter>Project 2\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Orders.cpp">
+      <Filter>Project 2\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="AI.cpp">
+      <Filter>Project 2\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="CutSceneManager.cpp">
+      <Filter>Project 2\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayScene.cpp">
+      <Filter>Project 2\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="QuestHUD.cpp">
+      <Filter>Project 2\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="HUD.cpp">
+      <Filter>Project 2\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="HUDFuncs.cpp">
+      <Filter>Project 2\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticQuadtree.cpp">
+      <Filter>Project 2\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="theoraplay.cpp" />
+    <ClCompile Include="HUDTools.cpp">
+      <Filter>Project 2\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="Video.cpp">
+      <Filter>Project 2\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="unzip.cpp">
+      <Filter>Project 2\Tools</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PugiXml\src\pugiconfig.hpp">
+      <Filter>Project 2\Tools\PuguiXML</Filter>
+    </ClInclude>
+    <ClInclude Include="PugiXml\src\pugixml.hpp">
+      <Filter>Project 2\Tools\PuguiXML</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Pathfinding.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Textures.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Project 2\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Module.h">
+      <Filter>Project 2</Filter>
+    </ClInclude>
+    <ClInclude Include="PerfTimer.h">
+      <Filter>Project 2\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Project 2\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="p2Defs.h">
+      <Filter>Project 2</Filter>
+    </ClInclude>
+    <ClInclude Include="p2Log.h">
+      <Filter>Project 2</Filter>
+    </ClInclude>
+    <ClInclude Include="p2Point.h">
+      <Filter>Project 2</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Project 2</Filter>
+    </ClInclude>
+    <ClInclude Include="Unit.h">
+      <Filter>Project 2\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityManager.h">
+      <Filter>Project 2\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Project 2\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Building.h">
+      <Filter>Project 2\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="FogOfWar.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="MemLeaks.h">
+      <Filter>Project 2\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Project 2\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuScene.h">
+      <Filter>Project 2\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneElement.h">
+      <Filter>Project 2\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Project 2\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Villager.h">
+      <Filter>Project 2\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Hero.h">
+      <Filter>Project 2\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleManager.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Minimap.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="QuestManager.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="TechTree.h">
+      <Filter>Project 2\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Orders.h">
+      <Filter>Project 2\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="AI.h">
+      <Filter>Project 2\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Project 2\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFaction.h">
+      <Filter>Project 2\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="CutSceneManager.h">
+      <Filter>Project 2\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayScene.h">
+      <Filter>Project 2\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="QuestHUD.h">
+      <Filter>Project 2\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticQuadtree.h">
+      <Filter>Project 2\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="theoraplay.h" />
+    <ClInclude Include="Video.h">
+      <Filter>Project 2\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="unzip.h">
+      <Filter>Project 2\Tools</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Project 2">
+      <UniqueIdentifier>{cb944693-b9d0-484c-bad2-02d5a7cdbec6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Project 2\Tools">
+      <UniqueIdentifier>{42c748be-4a37-49de-970f-5be811d06b38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Project 2\Tools\PuguiXML">
+      <UniqueIdentifier>{7cb78d67-17cc-45eb-af97-e2106becce7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Project 2\Scenes">
+      <UniqueIdentifier>{e07660eb-d36f-4cc9-af59-324d31c2f2f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Project 2\Modules">
+      <UniqueIdentifier>{244722d1-90ce-423d-8e7a-556211865a32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Project 2\Entities">
+      <UniqueIdentifier>{52b054e4-6d6c-4d3b-8276-c912ba96e370}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Project 2\HUD">
+      <UniqueIdentifier>{bb69f020-f0bd-42d1-ab65-f50d43aa9470}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\Game\config.xml">
+      <Filter>Project 2</Filter>
+    </Xml>
+    <Xml Include="..\Game\GameData.xml">
+      <Filter>Project 2</Filter>
+    </Xml>
+  </ItemGroup>
+</Project>
