@@ -2,7 +2,6 @@
 #include "Render.h"
 #include "Application.h"
 #include "EntityManager.h"
-#include "Pathfinding.h"
 #include "p2Log.h"
 #include "math.h"
 #include "Map.h"
@@ -14,10 +13,8 @@
 #include "Gui.h"
 #include "SceneManager.h"
 #include "Hero.h"
-#include "Orders.h"
 #include "Villager.h"
 #include "Audio.h"
-#include "AI.h"
 #include "QuestManager.h"
 #include "FogOfWar.h"
 
@@ -82,85 +79,13 @@ Unit::~Unit()
 
 bool Unit::Update(float dt)
 {
-	r = currentAnim->at(currentDirection).GetCurrentFrame();
-
-	if (state != DESTROYED) {
-
-		if (IsHero) {
-			Hero* hero = (Hero*)this;
-			hero->HeroUpdate();
-		}
-
-		if (!order_list.empty()) {
-
-			if (order_list.front()->state == NEEDS_START)
-				order_list.front()->Start(this);
-						  
-			if (order_list.front()->state == EXECUTING)
-				order_list.front()->Execute(this);
-						  
-			if (order_list.front()->state == COMPLETED)
-				order_list.pop_front();
-		}
-		else {
-			if (entityTexture != unitIdleTexture)
-				SetTexture(state = IDLE);
-		}
-	}
-	else {
-		
-		if (entityTexture != unitDieTexture)
-		{
-			SetTexture(state = DESTROYED);
-			App->audio->PlayUnitDeadSound(this);
-		}
-
-		if (currentAnim->at(currentDirection).Finished())
-		{
-			if (faction == App->entityManager->player->faction) {
-				App->entityManager->player->units.remove(this);
-				if (IsVillager)
-					App->entityManager->player->villagers.remove((Villager*)this);
-			}
-			else {
-				App->entityManager->AI_faction->units.remove(this);
-				if (IsVillager)
-					App->entityManager->AI_faction->villagers.remove((Villager*)this);
-			}
-
-			App->collision->DeleteCollider(collider);
-			App->collision->DeleteCollider(range);
-			App->collision->DeleteCollider(los);
-
-			if (faction == FREE_MEN) App->fog->DeleteEntityFog(this->entityID);
-
-			App->entityManager->DeleteEntity(this);
-		}
-	}
-
+	
 	return true;
 }
 
 void Unit::Destroy() {
 
-	if (faction == App->entityManager->player->faction) {
-		App->entityManager->player->units.remove(this);
-		if (IsVillager)
-			App->entityManager->player->villagers.remove((Villager*)this);
-	}
-	else {
-		App->entityManager->AI_faction->units.remove(this);
-		if (IsVillager)
-			App->entityManager->AI_faction->villagers.remove((Villager*)this);
-	}
-
-	App->collision->DeleteCollider(collider);
-	App->collision->DeleteCollider(range);
-	App->collision->DeleteCollider(los);
-
-	if (faction == FREE_MEN) App->fog->DeleteEntityFog(this->entityID);
-
-	App->entityManager->DeleteEntity(this);
+	
 }
 
 bool Unit::Draw()
@@ -262,17 +187,4 @@ void Unit::SetTexture(EntityState texture_of)
 
 void Unit::SubordinatedMovement(iPoint p) {
 	
-	if (sub_movement == nullptr) {
-		sub_movement = new MoveToOrder(this, p);
-		if (sub_movement->state == NEEDS_START)
-			sub_movement->Start(this);
-	}
-	else {
-		if (sub_movement->state == COMPLETED) {
-			RELEASE(sub_movement);
-			sub_movement = nullptr;
-		}
-		else
-			sub_movement->Execute(this);
-	}
 }

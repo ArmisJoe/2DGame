@@ -104,7 +104,7 @@ void Minimap::DrawTerrain(int x, int y, int r, int g, int b)
 
 void Minimap::DrawUnits()
 {
-	for (list<Unit*>::iterator it = App->entityManager->player->units.begin(); it != App->entityManager->player->units.end(); it++) {
+	/*for (list<Unit*>::iterator it = App->entityManager->player->units.begin(); it != App->entityManager->player->units.end(); it++) {
 
 		SDL_Rect rect;
 		rect.x = minimapPos.x - App->render->camera.x + ((*it)->entityPosition.x * minimapRatio);
@@ -146,7 +146,7 @@ void Minimap::DrawUnits()
 			rect.h = 4;
 			App->render->DrawQuad(rect, 255, 0, 255, true);
 		}
-	}
+	}*/
 }
 
 

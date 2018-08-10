@@ -62,7 +62,7 @@ bool QuestManager::Start()
 	}
 
 	// If it's already active we add the gui
-	App->sceneManager->level1_scene->questHUD.AddActiveQuest("Explorer", "Explore the map, there are hidden quests!", 0);
+	//App->sceneManager->level1_scene->questHUD.AddActiveQuest("Explorer", "Explore the map, there are hidden quests!", 0);
 
 	return ret;
 }
@@ -115,10 +115,10 @@ bool QuestManager::TriggerCallback(Building* t)
 						if ((*it)->state == 1)
 							counter++;
 					}
-					if (counter == 2) App->sceneManager->level1_scene->questHUD.RemoveQuest(0);
+					//if (counter == 2) App->sceneManager->level1_scene->questHUD.RemoveQuest(0);
 
 					App->gui->hud->AlertText("New side quest!", 5);
-					App->sceneManager->level1_scene->questHUD.AddActiveQuest((*it)->name, (*it)->description, (*it)->id);
+					//App->sceneManager->level1_scene->questHUD.AddActiveQuest((*it)->name, (*it)->description, (*it)->id);
 
 					return true;
 				}
@@ -147,23 +147,23 @@ bool QuestManager::StepCallback(Building* t)
 				{
 					LOG("Quest completed");
 					App->gui->hud->AlertText("Quest completed", 5);
-					App->sceneManager->level1_scene->questHUD.RemoveQuest((*it)->id);
+					//App->sceneManager->level1_scene->questHUD.RemoveQuest((*it)->id);
 					(*it)->state = 2;
 
 					// Reward
 					if ((*it)->reward == INCREASE_GOLD)
 					{
-						App->entityManager->player->resources.gold += 300;
-						App->sceneManager->level1_scene->UpdateResources();
+						//App->entityManager->player->resources.gold += 300;
+						//App->sceneManager->level1_scene->UpdateResources();
 					}
 					else if ((*it)->reward == CREATE_HERO)
 					{
 						// Create a unit here
-						App->entityManager->player->tech_tree->Researched(ROHAN_HORSES);
+						/*App->entityManager->player->tech_tree->Researched(ROHAN_HORSES);
 						App->gui->hud->studying_tech = true;
 						App->gui->hud->tech_studied = App->gui->tech_bt[ROHAN_HORSES].type;
 						App->gui->hud->AlertText("Check your Castle for a new unit", 3);
-						App->entityManager->player->Town_center->units_in_queue.push_back(ROHAN_KNIGHT);			
+						App->entityManager->player->Town_center->units_in_queue.push_back(ROHAN_KNIGHT);*/			
 					}
 					ret = true;
 				}
@@ -194,7 +194,7 @@ bool QuestManager::Load(pugi::xml_node & d)
 	{
 		(*it)->state = node.attribute("state").as_uint();
 		if ((*it)->state == 1)
-			App->sceneManager->level1_scene->questHUD.AddActiveQuest((*it)->name, (*it)->description, (*it)->id);
+		//	App->sceneManager->level1_scene->questHUD.AddActiveQuest((*it)->name, (*it)->description, (*it)->id);
 		node = node.next_sibling("Quest");
 	}
 

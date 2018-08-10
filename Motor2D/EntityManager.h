@@ -4,11 +4,9 @@
 #include "Module.h"
 #include "Entity.h"
 #include "Unit.h"
-#include "TechTree.h"
 #include "Building.h"
 #include "Resource.h"
 #include "Render.h"
-#include "GameFaction.h"
 #include "Villager.h"
 #include "Collision.h"
 
@@ -93,9 +91,6 @@ public:
 
 	list<Entity*> WorldEntityList;
 	list<Resource*> resource_list;
-
-	GameFaction* player = nullptr;
-	GameFaction* AI_faction = nullptr;
 
 	CursorHovering cursor_hover = HOVERING_TERRAIN;
 	bool placingBuilding = false;

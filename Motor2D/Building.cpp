@@ -7,9 +7,7 @@
 #include "EntityManager.h"
 #include "Collision.h"
 #include "p2Log.h"
-#include "Orders.h"
 #include "math.h"
-#include "AI.h"
 #include "SceneManager.h"
 #include "Audio.h"
 #include "FogOfWar.h"
@@ -80,55 +78,6 @@ void Building::GetBuildingBoundaries()
 bool Building::Update(float dt)
 {
 
-	if (state != DESTROYED && state != BEING_BUILT) {
-
-		if (type == MILL)
-			{
-			if (mill_food.ReadSec() >= 3)
-			{
-				App->entityManager->player->resources.food += 5;
-				App->sceneManager->level1_scene->UpdateResources();
-				mill_food.Start();
-			}
-		}
-		if (!units_in_queue.empty()) {
-			
-			if (App->entityManager->unitsDB[units_in_queue.front()]->faction == FREE_MEN)
-			drawUnitsInQueue((int)(App->entityManager->unitsDB[units_in_queue.front()]->cooldown_time * 1000), (int)creation_timer.Read() - (int) aux_timer, App->entityManager->unitsDB[units_in_queue.front()]->IsHero);
-			
-			/*(int)(tech->research_time * 1000), (int)tech->research_timer.Read() - (int)tech->aux_timer*/
-			
-			if (creation_timer.Read() - aux_timer > App->entityManager->unitsDB[units_in_queue.front()]->cooldown_time * 1000) {
-
-				iPoint creation_place = App->map->WorldToMap(entityPosition.x, entityPosition.y + 100);
-				creation_place = App->pathfinding->FindNearestAvailable(creation_place, 10);
-				creation_place = App->map->MapToWorld(creation_place.x, creation_place.y);
-
-				Unit* unit = App->entityManager->CreateUnit(creation_place.x, creation_place.y, units_in_queue.front());
-
-				if (unit->faction == SAURON_ARMY && App->ai->state == OFFENSIVE)
-					App->ai->last_attack_squad.push_back(unit);
-
-				units_in_queue.pop_front();
-				aux_timer = creation_timer.Read();
-			}
-		}
-		else 
-			aux_timer = creation_timer.Read();
-
-
-		if (state == ATTACKING && attack_timer.ReadSec() > 3) {    //  3: building atatack speed (provisional)
-
-			if (Entity* enemy = App->entityManager->FindTarget(this)) {
-				if (range->CheckCollision(enemy->collider)) 
-					enemy->Life -= MAX(Attack - enemy->Defense, buildingPiercingDamage);  // this should cast an arrow particle
-				else
-					state = IDLE;
-			}
-			else state = IDLE;
-		}
-	}
-	else if (Life <= 0) Destroy();
 	
 
 	return true;
@@ -192,34 +141,6 @@ bool Building::Draw()
 }
 
 void Building::Destroy() {
-
-	if (faction == SAURON_ARMY && state == DESTROYED && type != SAURON_TOWER && type != ORC_BARRACKS && type != ORC_ARCHERY_RANGE){
-		Life = 1;
-		creation_timer.Start();
-	}
-	else {
-		if (faction == App->entityManager->player->faction)
-			App->entityManager->player->buildings.remove(this);
-		else
-			App->entityManager->AI_faction->buildings.remove(this);
-
-		App->collision->DeleteCollider(collider);
-
-		if (canAttack)
-			App->collision->DeleteCollider(range);
-
-		if (faction == FREE_MEN) App->fog->DeleteEntityFog(this->entityID);
-
-		if (Life <= 0)
-		{
-			if (App->render->CullingCam(this->entityPosition))
-				App->audio->PlayFx(rand() % ((BUILDING_DEATH_4 - BUILDING_DEATH_1) + 1) + BUILDING_DEATH_1);
-		}
-
-		App->entityManager->DeleteEntity(this);
-	}
-
-	state = DESTROYED;
 
 }
 

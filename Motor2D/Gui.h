@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 #include "Hero.h"
-#include "TechTree.h"
 #include "EntityManager.h"
 
 using namespace std;
@@ -397,7 +396,6 @@ public:
 	void AlertText(string text, uint duration);
 	bool tech_success = false;
 	bool studying_tech = false;
-	TechType tech_studied;
 };
 
 
@@ -546,7 +544,6 @@ struct tech_button {
 	string desc;
 	string cost;
 	vector<SDL_Rect> blit_sections;
-	TechType type;
 };
 
 struct skill_button {

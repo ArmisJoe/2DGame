@@ -61,19 +61,6 @@ private:
 	vector<Button*> buttons;
 
 public:
-	void UpdateResources();
-	void UpdatePopulation();
-	bool CheckUnitsRoom();
-	bool CheckHousesRoom();
-	bool CheckBuildingsRoom();
-
-private:
-	// TIMER
-	Timer timer;
-	Label* Timer_lbl = nullptr;
-	void UpdateTime(float time);
-public:
-	QuestHUD questHUD;
 	// RESOURCES 
 	Label* wood = nullptr, *food = nullptr, *gold = nullptr, *stone = nullptr, *villagers = nullptr;
 

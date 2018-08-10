@@ -9,9 +9,7 @@
 #include "Gui.h"
 #include "SceneManager.h"
 #include "Window.h"
-#include "Orders.h"
 #include <stdlib.h>  
-#include "TechTree.h"
 #include "EntityManager.h"
 #include "Hero.h"
 #include "Audio.h"
@@ -304,22 +302,7 @@ void HUD::Update() {
 											{
 												if (App->gui->building_bt[i].button != nullptr) {
 													
-													if (App->gui->building_bt[i].type == HOUSE && App->sceneManager->level1_scene->CheckHousesRoom() && App->sceneManager->level1_scene->CheckBuildingsRoom())
-													{
-														if (!App->entityManager->placingBuilding && App->gui->building_bt[i].button->current == CLICKUP) {
-
-															App->entityManager->placingBuilding = true;
-															App->entityManager->placing_type = App->gui->building_bt[i].type;
-														}
-													}
-													else if (App->sceneManager->level1_scene->CheckBuildingsRoom() && App->gui->building_bt[i].type != HOUSE)
-													{
-														if (!App->entityManager->placingBuilding && App->gui->building_bt[i].button->current == CLICKUP) {
-
-															App->entityManager->placingBuilding = true;
-															App->entityManager->placing_type = App->gui->building_bt[i].type;
-														}
-													}
+										
 												}
 											}
 										}
@@ -430,18 +413,7 @@ void HUD::Update() {
 							{
 								if (create_villager_bt->current == CLICKUP)
 								{
-									if (App->sceneManager->level1_scene->CheckUnitsRoom())
-									{
-										if (App->entityManager->player->resources.Spend(App->entityManager->unitsDB[ELF_VILLAGER]->cost))
-										{
-											building->units_in_queue.push_back(ELF_VILLAGER);
-										}
-									}
-									else
-									{
-										AlertText("NOT ENOUGH HOUSES", 5);
-										App->audio->PlayFx(POPULATION_LIMIT);
-									}
+						
 								}
 							}
 							/*if (create_hero_bt != nullptr && id == TOWN_CENTER)
@@ -457,24 +429,12 @@ void HUD::Update() {
 								if (App->gui->tech_bt[i].button != nullptr) {
 									if (App->gui->tech_bt[i].button->current == CLICKUP)
 									{
-										if (App->entityManager->player->tech_tree->researching_tech == false) {
-											if (App->entityManager->player->resources.Spend(App->entityManager->player->tech_tree->all_techs.at(App->gui->tech_bt[i].type)->cost))
-											{
-												App->entityManager->player->tech_tree->StartResearch(App->gui->tech_bt[i].type);
-												studying_tech = true;
-												tech_studied = App->gui->tech_bt[i].type;
-											}
-										}
-										else
-										{
-											App->audio->PlayFx(POPULATION_LIMIT);
-										}
+										
 									}
 								}
 							}
 							if (tech_success) {
 								tech_success = false;
-								HUDClearBuildingMenu();
 								HUDBuildingMenu();
 							}
 							/*	}*/
@@ -521,13 +481,7 @@ void HUD::Update() {
 								{
 									if (App->gui->unit_bt[i].button != nullptr) {
 										if (App->gui->unit_bt[i].button->current == CLICKUP) {
-											if (App->sceneManager->level1_scene->CheckUnitsRoom()) {
-												if (App->entityManager->player->resources.Spend(App->entityManager->unitsDB[App->gui->unit_bt[i].type]->cost))
-												{
-													building->units_in_queue.push_back(App->gui->unit_bt[i].type);
-												}
-											}
-											else AlertText("NOT ENOUGH HOUSES", 5);
+											
 										}
 									}
 								}
@@ -545,13 +499,7 @@ void HUD::Update() {
 						{
 							if (App->gui->unit_bt[i].button != nullptr) {
 								if (App->gui->unit_bt[i].button->current == CLICKUP) {
-									if (App->sceneManager->level1_scene->CheckUnitsRoom()) {
-										if (App->entityManager->player->resources.Spend(App->entityManager->unitsDB[App->gui->unit_bt[i].type]->cost))
-										{
-											building->units_in_queue.push_back(App->gui->unit_bt[i].type);
-										}
-									}
-									else AlertText("NOT ENOUGH HOUSES", 5);
+									
 								}
 							}
 						}
@@ -852,7 +800,6 @@ bool Gui::LoadHUDData()
 			string desc(unitNodeInfo.child("Description").attribute("value").as_string());
 			bt.desc = desc;
 			int id = unitNodeInfo.child("ID").attribute("value").as_int();
-			bt.type = (TechType)id;
 
 			proportions.x = unitNodeInfo.child("Position").attribute("x").as_int();
 			proportions.y = unitNodeInfo.child("Position").attribute("y").as_int();
@@ -906,25 +853,5 @@ bool Gui::LoadHUDData()
 }
 
 void Gui::LoadTechInfo() {
-	for (vector<Tech*>::iterator it = App->entityManager->player->tech_tree->all_techs.begin(); it != App->entityManager->player->tech_tree->all_techs.end(); ++it)
-	{
-		tech_button bt;
-		string name((*it)->name);
-		bt.name = name;
-		string desc((*it)->desc);
-		bt.desc = desc;
-		int id = (*it)->id;
-		bt.type = (TechType)id;
-
-		bt.blit_sections.push_back((*it)->minature);
-
-		SDL_Rect p = (*it)->minature;
-		p.x += p.w;
-
-		bt.blit_sections.push_back(p);
-		bt.button = nullptr;
-
-		bt.cost = "wood: " + std::to_string((*it)->cost.wood) + " food: " + std::to_string((*it)->cost.food) + " gold: " + std::to_string((*it)->cost.gold) + " stone: " + std::to_string((*it)->cost.stone);
-		tech_bt.push_back(bt);
-	}
+	
 }

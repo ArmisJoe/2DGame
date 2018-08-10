@@ -7,7 +7,6 @@
 #include "Map.h"
 #include "Unit.h"
 #include "Window.h"
-#include "StaticQuadtree.h"
 
 Collision::Collision() : Module()
 {
@@ -60,7 +59,6 @@ bool Collision::Start()
 {
 	uint w, h;
 	App->win->GetWindowSize(w, h);
-	quadTree = new StaticQuadTree();
 	return true;
 }
 
@@ -68,7 +66,6 @@ bool Collision::PreUpdate()
 {
 	for (list<Collider*>::iterator it = colliders_to_delete.begin(); it != colliders_to_delete.end(); it++) {
 
-		quadTree->Remove(*it);
 		colliders_to_delete.erase(it);
 		RELEASE(*it);
 	}
@@ -99,7 +96,6 @@ bool Collision::CleanUp()
 	}
 
 	colliders.clear();
-	quadTree->ClearTree();
 	debug = false;
 
 	return true;
@@ -175,7 +171,7 @@ Collider * Collision::AddCollider(iPoint position, int radius, COLLIDER_TYPE typ
 {
 	Collider* ret = new Collider(position, radius, type, callback, entity);
 	colliders.push_back(ret);
-	quadTree->Insert(ret);
+	//quadTree->Insert(ret);
 	
 	return ret;
 }
@@ -247,11 +243,11 @@ Collider* Collision::FindCollider(iPoint worldPos, int radius, Collider* collide
 
 	Collider* col = nullptr;
 	iPoint MapPos = App->map->WorldToMap(worldPos.x, worldPos.y);
-	int quadtree_node = ((trunc((float)(MapPos.y / NODES_FOR_ROW)) * NODES_FOR_ROW) + (trunc((float)(MapPos.x / NODES_FOR_ROW))));
+	//int quadtree_node = ((trunc((float)(MapPos.y / NODES_FOR_ROW)) * NODES_FOR_ROW) + (trunc((float)(MapPos.x / NODES_FOR_ROW))));
 
-	if (colliders.size() > 0 && (quadtree_node >= 0 && quadtree_node < 99)) {
+	/*if (colliders.size() > 0 && (quadtree_node >= 0 && quadtree_node < 99)) {
 		col = colliders.front();
-		for (list<Collider*>::iterator it = quadTree->nodes.at(quadtree_node).begin(); it != quadTree->nodes.at(quadtree_node).end(); it++) {
+		/*for (list<Collider*>::iterator it = quadTree->nodes.at(quadtree_node).begin(); it != quadTree->nodes.at(quadtree_node).end(); it++) {
 			if ((*it)->type == COLLIDER_RANGE || (*it)->type == COLLIDER_LOS)
 				continue;
 
@@ -261,7 +257,7 @@ Collider* Collision::FindCollider(iPoint worldPos, int radius, Collider* collide
 
 		if (col->pos.DistanceTo(worldPos) > (col->r + radius) || col->entity->state == DESTROYED || col == collider_to_ignore)
 			col = nullptr;
-	}
+	}*/
 
 	return col;
 }

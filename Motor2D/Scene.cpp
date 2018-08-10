@@ -5,25 +5,19 @@
 #include "Render.h"
 #include "Window.h"
 #include "Map.h"
-#include "PathFinding.h"
 #include "Scene.h"
 #include "p2Log.h"
-#include "Orders.h"
 #include "EntityManager.h"
 #include "Unit.h"
 #include "FogOfWar.h"
-#include "GameFaction.h"
 #include "Gui.h"
 #include <sstream>
-#include "StaticQuadtree.h"
-#include "AI.h"
 #include "FileSystem.h"
 #include "SceneManager.h"
 #include "Building.h"
 #include "FogOfWar.h"
 #include "Minimap.h"
 #include "Fonts.h"
-#include "CutSceneManager.h"
 
 Scene::Scene() : SceneElement("scene")
 {
@@ -56,7 +50,7 @@ bool Scene::Start()
 			int w, h;
 			uchar* data = NULL;
 			if (App->map->CreateWalkabilityMap(w, h, &data))
-				App->pathfinding->SetMap(w, h, data);
+				//App->pathfinding->SetMap(w, h, data);
 
 			RELEASE_ARRAY(data);
 		}
@@ -64,21 +58,19 @@ bool Scene::Start()
 		start = true;
 	}
 
-	App->pathfinding->isGameScene = true;
-
 	// Loading camera position && limits =======================================
 
-	App->render->camera.x = STARTING_CAMERA_X;
+	/*App->render->camera.x = STARTING_CAMERA_X;
 	App->render->camera.y = STARTING_CAMERA_Y;
 
 	App->render->cameraScene.down = -3745;
 	App->render->cameraScene.up = -245;
 	App->render->cameraScene.left = 3993;
-	App->render->cameraScene.right = -3000;
+	App->render->cameraScene.right = -3000;*/
 
 	// Loading UI ====================================================
 
-	uint x, y;
+	/*uint x, y;
 	App->win->GetWindowSize(x, y);
 
 	elements = App->gui->GetElements("LEVEL");
@@ -186,30 +178,28 @@ bool Scene::Start()
 	stone = (Label*)App->gui->CreateLabel(to_string(App->entityManager->player->resources.stone), -STARTING_CAMERA_X + 360, -STARTING_CAMERA_Y + 5, nullptr);
 	stone->SetColor({ 255, 255, 255 ,255 });
 	villagers = (Label*)App->gui->CreateLabel("0/0", -STARTING_CAMERA_X + 480, -STARTING_CAMERA_Y + 5, nullptr);
-	villagers->SetColor({ 255, 255, 255 ,255 });
+	villagers->SetColor({ 255, 255, 255 ,255 });*/
 
 	// Fog of war, entities & resources ===============================================================================
 
-	App->fog->Start();
-
 	//Resources
-	App->map->LoadResources(App->map->map_file.child("map"));
+	//App->map->LoadResources(App->map->map_file.child("map"));
 
 	// Units
-	App->entityManager->CreateUnit(TOWN_HALL_POS_X + 300, TOWN_HALL_POS_Y, ELVEN_CAVALRY);
+	//App->entityManager->CreateUnit(TOWN_HALL_POS_X + 300, TOWN_HALL_POS_Y, ELVEN_CAVALRY);
 
 	// Buildings
-	App->entityManager->player->Town_center = App->entityManager->CreateBuilding(TOWN_HALL_POS_X, TOWN_HALL_POS_Y, TOWN_CENTER);
-	App->entityManager->player->Town_center;
+	//App->entityManager->player->Town_center = App->entityManager->CreateBuilding(TOWN_HALL_POS_X, TOWN_HALL_POS_Y, TOWN_CENTER);
+	//App->entityManager->player->Town_center;
 
 
 	// Villager
-	App->entityManager->CreateUnit(TOWN_HALL_POS_X + 250, TOWN_HALL_POS_Y + 50, ELF_VILLAGER);
+	//App->entityManager->CreateUnit(TOWN_HALL_POS_X + 250, TOWN_HALL_POS_Y + 50, ELF_VILLAGER);
 
 	//AI 
-	App->ai->enabled = true;
+	//App->ai->enabled = true;
 
-	iPoint enemyTownCenterPos{ 1800, 3100 };
+	/*iPoint enemyTownCenterPos{ 1800, 3100 };
 	App->entityManager->AI_faction->Town_center;
 	App->ai->selected_building = App->entityManager->AI_faction->Town_center = App->entityManager->CreateBuilding(enemyTownCenterPos.x, enemyTownCenterPos.y, SAURON_TOWER);
 
@@ -229,21 +219,17 @@ bool Scene::Start()
 
 	App->entityManager->CreateBuilding(enemyTownCenterPos.x + 250, enemyTownCenterPos.y - 250, BEAST_PIT);
 	App->entityManager->CreateBuilding(enemyTownCenterPos.x - 400, enemyTownCenterPos.y, URUK_HAI_PIT);
-	App->entityManager->CreateBuilding(enemyTownCenterPos.x, enemyTownCenterPos.y + 300, ORC_BLACKSMITH);
+	App->entityManager->CreateBuilding(enemyTownCenterPos.x, enemyTownCenterPos.y + 300, ORC_BLACKSMITH);*/
 
 	// ================================================================================================================
 
-	game_finished = false;
 
-	App->entityManager->player->resources.food += 0;
+	/*App->entityManager->player->resources.food += 0;
 	App->entityManager->player->resources.stone += 0;
 	App->entityManager->player->resources.gold += 0;
-	App->entityManager->player->resources.wood += 0;
+	App->entityManager->player->resources.wood += 0;*/
 
-	UpdateResources();
-
-	App->quest->Start();
-	questHUD.Start();
+	//UpdateResources();
 
 	return true;
 }
@@ -265,30 +251,10 @@ bool Scene::Update(float dt)
 		App->map->godmode = !App->map->godmode;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN) {
-		App->entityManager->player->resources.wood += 500;
-		App->sceneManager->level1_scene->UpdateResources();
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN) {
-		App->entityManager->player->resources.food += 500;
-		App->sceneManager->level1_scene->UpdateResources();
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_3) == KEY_DOWN) {
-		App->entityManager->player->resources.gold += 500;
-		App->sceneManager->level1_scene->UpdateResources();
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_4) == KEY_DOWN) {
-		App->entityManager->player->resources.stone += 500;
-		App->sceneManager->level1_scene->UpdateResources();
-	}
-
 	// Move camera by shortcut
 	if (App->input->GetKey(App->input->controls[MOVE_CAMERA]) == KEY_DOWN) {
 
-		iPoint cameraOldPos = { App->render->camera.x, App->render->camera.y };
+		/*iPoint cameraOldPos = { App->render->camera.x, App->render->camera.y };
 
 
 		App->render->camera.x = STARTING_CAMERA_X;
@@ -300,18 +266,14 @@ bool Scene::Update(float dt)
 		movement.first = App->render->camera.x - cameraOldPos.x;
 		movement.second = App->render->camera.y - cameraOldPos.y;
 
-		App->gui->ScreenMoves(movement);
+		App->gui->ScreenMoves(movement);*/
 	}
-
-
-	App->gui->ScreenMoves(App->render->MoveCameraWithCursor(dt));
-	App->map->Draw();
 
 
 	// --------------------------------------------
 	//						UI
 	//---------------------------------------------
-	if (ui_menu.IsEnabled())
+	/*if (ui_menu.IsEnabled())
 	{
 		App->gui->Focus(ui_menu.FocusArea());
 
@@ -365,13 +327,11 @@ bool Scene::Update(float dt)
 			App->entityManager->game_stops = false;
 			App->gui->Unfocus();
 		}
-	}
+	}*/
 
-	questHUD.Update();
-	UpdatePopulation();
-	App->minimap->GetClickableArea(images[MINIMAP]->pos);
+	//App->minimap->GetClickableArea(images[MINIMAP]->pos);
 
-	if (surrender_menu.IsEnabled()) {
+	/*if (surrender_menu.IsEnabled()) {
 		App->gui->Focus(surrender_menu.FocusArea());
 
 		if (buttons[YES]->current == CLICKUP)
@@ -386,7 +346,7 @@ bool Scene::Update(float dt)
 			App->gui->Unfocus();
 			App->entityManager->game_stops = false;
 		}
-	}
+	}*/
 
 	return true;
 }
@@ -396,7 +356,7 @@ bool Scene::PostUpdate()
 {
 	bool ret = true;
 
-	if ((App->entityManager->player->Town_center->Life <= 0 && game_finished == false) || (App->entityManager->player->units.size() <= 0 && App->entityManager->player->resources.food < 50 && game_finished == false)) {
+	/*if ((App->entityManager->player->Town_center->Life <= 0 && game_finished == false) || (App->entityManager->player->units.size() <= 0 && App->entityManager->player->resources.food < 50 && game_finished == false)) {
 		uint w, h;
 		App->win->GetWindowSize(w, h);
 		game_finished = true;
@@ -422,7 +382,7 @@ bool Scene::PostUpdate()
 		App->sceneManager->ChangeScene(this, App->sceneManager->menu_scene);
 		App->entityManager->game_stops = false;
 			
-	}
+	}*/
 
 	return ret;
 }
@@ -432,79 +392,14 @@ bool Scene::CleanUp()
 {
 	LOG("Freeing scene");
 
-	App->entityManager->player->tech_tree->Reset(FREE_MEN);
-	App->entityManager->AI_faction->tech_tree->Reset(SAURON_ARMY);
-
-	questHUD.CleanUp();
-	ui_menu.CleanUp();
-	surrender_menu.CleanUp();
-
-	App->gui->hud->ClearAll();
-	App->gui->DestroyALLUIElements();
-
-	elements.clear();
-	images.clear();
-	buttons.clear();
-
-	App->ai->enabled = false;
-
-	App->entityManager->CleanUp();
+	/*App->entityManager->CleanUp();
 	App->collision->CleanUp();
 	App->fog->CleanUp();
 	App->quest->CleanUp();
 
 
-	App->entityManager->game_stops = false;
+	App->entityManager->game_stops = false;*/
 
 
 	return true;
-}
-
-void Scene::UpdateTime(float time)
-{
-	Timer_lbl->SetString(to_string((int)time / 60 / 10) + to_string((int)time / 60 % 10) + ':' + to_string((int)time % 60 / 10) + to_string((int)time % 60 % 10));
-}
-
-void Scene::UpdateResources()
-{
-	wood->SetString(to_string(App->entityManager->player->resources.wood));
-	food->SetString(to_string(App->entityManager->player->resources.food));
-	stone->SetString(to_string(App->entityManager->player->resources.stone));
-	gold->SetString(to_string(App->entityManager->player->resources.gold));
-}
-
-void Scene::UpdatePopulation()
-{
-	uint houses_count = 0;
-	uint units_in_queue = 0;
-	for (list<Building*>::iterator it = App->entityManager->player->buildings.begin(); it != App->entityManager->player->buildings.end(); ++it) {
-		if ((*it)->type == HOUSE) houses_count++;
-		units_in_queue += (*it)->units_in_queue.size();
-	}
-	villagers->SetString(to_string(App->entityManager->player->units.size() + units_in_queue) + '/' + to_string((houses_count * 5) + 2));
-}
-
-bool Scene::CheckUnitsRoom()
-{
-	uint houses_count = 0;
-	uint units_in_queue = 0;
-	for (list<Building*>::iterator it = App->entityManager->player->buildings.begin(); it != App->entityManager->player->buildings.end(); ++it) {
-		if ((*it)->type == HOUSE) houses_count++;
-		units_in_queue += (*it)->units_in_queue.size();
-	}
-	return ((App->entityManager->player->units.size() + units_in_queue) < (houses_count * 5) + 2);
-}
-
-bool Scene::CheckHousesRoom()
-{
-	uint houses_count = 0;
-	for (list<Building*>::iterator it = App->entityManager->player->buildings.begin(); it != App->entityManager->player->buildings.end(); ++it) {
-		if ((*it)->type == HOUSE) houses_count++;
-	}
-	return (houses_count <= MAX_HOUSES);
-}
-
-bool Scene::CheckBuildingsRoom()
-{
-	return (App->entityManager->player->buildings.size() <= MAX_BUILDINGS);
 }

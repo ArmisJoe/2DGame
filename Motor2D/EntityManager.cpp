@@ -4,7 +4,6 @@
 #include "Application.h"
 #include "Scene.h"
 #include "Unit.h"
-#include "Pathfinding.h"
 #include "FogOfWar.h"
 #include "Render.h"
 #include "Textures.h"
@@ -14,25 +13,17 @@
 #include "Collision.h"
 #include "SceneManager.h"
 #include "Hero.h"
-#include "AI.h"
 #include "Villager.h"
-#include "Orders.h"
 #include <algorithm>
 
 EntityManager::EntityManager() : Module()
 {
 	name = "entityManager";
 	nextID = 1;
-
-	player = new GameFaction(FREE_MEN);
-	AI_faction = new GameFaction(SAURON_ARMY);
 }
 
 EntityManager::~EntityManager()
 {
-	RELEASE(player);
-	RELEASE(AI_faction);
-
 }
 
 bool EntityManager::Awake(pugi::xml_node & config)
@@ -88,205 +79,7 @@ bool EntityManager::Update(float arg_dt)
 
 	if (!game_stops)
 	{
-		player->tech_tree->Update();
-		AI_faction->tech_tree->Update();
 
-		Unit* unit = nullptr;
-		Villager* villager = nullptr;
-		Resource* resource = nullptr;
-		if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_DOWN && !selectedEntityList.empty() && selectedListType == COLLIDER_UNIT) {
-
-			if (selectedEntityList.front()->faction == FREE_MEN && !placingBuilding) {
-
-				for (list<Entity*>::iterator it = selectedEntityList.begin(); it != selectedEntityList.end(); it++) {
-					Unit* unit = (Unit*)(*it);
-
-					for (list<Order*>::iterator it2 = unit->order_list.begin(); it2 != unit->order_list.end(); it2++) {
-						RELEASE(*it2);
-						unit->order_list.clear();
-					}
-				}
-
-				Collider* clicked_on = CheckCursorHover(mouse);
-
-				switch (cursor_hover) {
-
-				case HOVERING_ENEMY:
-					if (clicked_on != nullptr) {
-						if (clicked_on->entity->state != DESTROYED && clicked_on->entity->isActive) {
-							for (list<Entity*>::iterator it = selectedEntityList.begin(); it != selectedEntityList.end(); it++) {
-								unit = (Unit*)(*it);
-								unit->order_list.push_back(new UnitAttackOrder());
-								unit->state = ATTACKING;
-							}
-						}
-					}
-					break;
-
-				case HOVERING_RESOURCE:
-
-					resource = (Resource*)clicked_on->entity;
-
-					if (resource->contains != NONE) {
-						for (list<Entity*>::iterator it = selectedEntityList.begin(); it != selectedEntityList.end(); it++) {
-							unit = (Unit*)(*it);
-							if (unit->IsVillager) {
-								villager = (Villager*)unit;
-								villager->resource_carried = resource->contains;
-								villager->order_list.push_back(new GatherOrder());
-							}
-						}
-					}
-					break;
-
-				case HOVERING_ALLY_BUILDING:
-
-					if (clicked_on->entity->state == BEING_BUILT) {
-
-						for (list<Entity*>::iterator it = selectedEntityList.begin(); it != selectedEntityList.end(); it++) {
-							unit = (Unit*)(*it);
-							if (unit->IsVillager)
-								unit->order_list.push_back(new BuildOrder());
-						}
-					}
-
-				default:
-					
-					break;
-				}
-
-				for (list<Entity*>::iterator it = selectedEntityList.begin(); it != selectedEntityList.end(); it++) {
-					Unit* unit = (Unit*)(*it);
-					if (unit->order_list.empty()) {
-						unit->order_list.push_front(new MoveToOrder(unit, mouse));
-
-						if (!unit->path.empty()) {
-							iPoint last_tileMap = App->map->WorldToMap(unit->path.back().x, unit->path.back().y);
-							last_tileMap = App->pathfinding->FindNearestAvailable(last_tileMap, 5);
-
-							if (last_tileMap.x != -1) {
-								iPoint last_tileWorld = App->map->MapToWorld(last_tileMap.x, last_tileMap.y);
-								unit->path.pop_back();
-								unit->path.push_back(last_tileWorld);
-							}
-						}
-					}
-				}
-			}
-
-			if (placingBuilding)
-				placingBuilding = false;
-		}
-
-		if (mouseY > NotHUD.y - CAMERA_OFFSET_Y && mouseY < NotHUD.h - CAMERA_OFFSET_Y) {
-
-			if (placingBuilding) {
-
-				Building* building = buildingsDB[placing_type];
-				Sprite aux;
-
-				aux.texture = building->entityTexture;
-				aux.pos.x = mouse.x - (building->imageWidth / 2);
-				aux.pos.y = mouse.y - (building->imageHeight / 1.5f);
-				aux.priority = mouseY - (building->imageHeight / 2) + building->imageHeight;
-				aux.rect.w = building->imageWidth;
-				aux.rect.h = building->imageHeight;
-
-				iPoint mouseMap = App->map->WorldToMap(mouseX, mouseY);
-				if (!App->collision->FindCollider(mouse, building->imageWidth / 2) && App->fog->Get(mouseMap.x, mouseMap.y) != 0) {
-
-					if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_UP) {
-
-						if (player->resources.Spend(building->cost)) {
-
-							building = CreateBuilding(mouse.x, mouse.y, placing_type);
-							placingBuilding = false;
-							App->fog->AddEntity(building);
-
-							if (!selectedEntityList.empty() && selectedListType == COLLIDER_UNIT) {
-
-								for (list<Entity*>::iterator it = selectedEntityList.begin(); it != selectedEntityList.end(); it++) {
-									unit = (Unit*)(*it);
-									if (unit->IsVillager)
-										unit->order_list.push_front(new BuildOrder());
-								}
-							}
-						}
-					}
-				}
-				else {
-					aux.change_color = true;
-					aux.r = 255;
-				}
-
-				App->render->sprites_toDraw.push_back(aux);
-			}
-			else {
-				// Selecting units by clicking/dragging
-				switch (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT))
-				{
-				case KEY_DOWN:
-					multiSelectionRect.x = mouseX;
-					multiSelectionRect.y = mouseY;
-					break;
-
-				case KEY_REPEAT:
-					multiSelectionRect.w = mouseX - multiSelectionRect.x;
-					multiSelectionRect.h = mouseY - multiSelectionRect.y;
-					break;
-
-				case KEY_UP:
-
-					FillSelectedList();
-					break;
-				}
-
-				// Selecting ALL units by shortcut
-				if (App->input->GetKey(App->input->controls[SELECT_ALL_UNITS]) == KEY_DOWN)
-				{
-					selectedEntityList.clear();
-					for (list<Entity*>::iterator it = WorldEntityList.begin(); it != WorldEntityList.end(); it++) 
-					{
-						if (App->render->CullingCam((*it)->entityPosition))
-						{
-							if ((*it)->faction == FREE_MEN && (*it)->entityType == ENTITY_UNIT)
-							{
-								Unit* aux = (Unit*)(*it);
-								if (aux->IsVillager == false) selectedEntityList.push_back((Entity*)(*it));
-							}
-						}
-					}
-
-					if (selectedEntityList.size() == 1)
-					{
-						list<Entity*>::iterator it = selectedEntityList.begin();
-						clicked_entity = (*it);
-					}
-				}
-
-				if (App->input->GetKey(App->input->controls[SELECT_ALL_VILLAGERS]) == KEY_DOWN)
-				{
-					selectedEntityList.clear();
-					for (list<Entity*>::iterator it = WorldEntityList.begin(); it != WorldEntityList.end(); it++)
-					{
-						if (App->render->CullingCam((*it)->entityPosition))
-						{
-							if ((*it)->faction == FREE_MEN && (*it)->entityType == ENTITY_UNIT)
-							{
-								Unit* aux = (Unit*)(*it);
-								if (aux->IsVillager == true) selectedEntityList.push_back((Entity*)(*it));
-							}
-						}
-					}
-
-					if (selectedEntityList.size() == 1)
-					{
-						list<Entity*>::iterator it = selectedEntityList.begin();
-						clicked_entity = (*it);
-					}
-				}
-			}
-		}
 
 		if (!selectedEntityList.empty())
 			DrawSelectedList();
@@ -340,11 +133,6 @@ bool EntityManager::CleanUp()
 	
 	WorldEntityList.clear();
 
-	if (player != nullptr) {
-		player->Reset();
-		AI_faction->Reset();
-	}
-
 	NotHUD = { 0,0,0,0 };
 
 	resource_list.clear();
@@ -380,12 +168,6 @@ bool EntityManager::Load(pugi::xml_node & data)
 
 	for (list<Entity*>::iterator it = App->entityManager->WorldEntityList.begin(); it != App->entityManager->WorldEntityList.end(); ++it)
 	{
-		if (*it != nullptr) {
-			if ((*it) != player->Town_center && (*it) != AI_faction->Town_center)
-			{
-				(*it)->Destroy();
-			}
-		}
 	}
 
 	App->entityManager->WorldEntityList.clear();
@@ -410,14 +192,6 @@ bool EntityManager::Load(pugi::xml_node & data)
 		unitTemplate->currentDirection = (unitDirection)unitNode.child("Direction").attribute("value").as_int();
 		unitTemplate->Life = unitNode.child("Life").attribute("value").as_int();
 		unitTemplate->entityID = unitNode.child("ID").attribute("value").as_int();
-
-		for (pugi::xml_node order = unitNode.child("Order"); order; order = order.next_sibling("Order"))
-		{
-			Order* unitOrder = new Order();
-			unitOrder->order_type = (OrderType)order.attribute("OrderType").as_int();
-			unitOrder->state = (Order_state)order.attribute("OrderState").as_int();
-			unitTemplate->order_list.push_back(unitOrder);
-		}
 	}
 
 	// -------------------------------------------
@@ -438,42 +212,12 @@ bool EntityManager::Load(pugi::xml_node & data)
 		else {
 			if ((buildingType)buildingNode.child("Type").attribute("value").as_int() == TOWN_CENTER)
 			{
-				if (player->Town_center->Life <= 0) {
-					player->Town_center->Destroy();
-
-					Building* buildingTemplate = App->entityManager->CreateBuilding(buildingNode.child("Position").attribute("x").as_int(),
-						buildingNode.child("Position").attribute("y").as_int(),
-						(buildingType)buildingNode.child("Type").attribute("value").as_int());
-					buildingTemplate->Life = buildingNode.child("Life").attribute("value").as_int();
-					buildingTemplate->state = (EntityState)buildingNode.child("State").attribute("value").as_int();
-					buildingTemplate->entityID = buildingNode.child("ID").attribute("value").as_int();
-					player->Town_center = buildingTemplate;
-				}
-				else {
-					player->Town_center->Life = buildingNode.child("Life").attribute("value").as_int();
-					player->Town_center->state = (EntityState)buildingNode.child("State").attribute("value").as_int();
-					App->entityManager->WorldEntityList.push_back(player->Town_center);
-					App->fog->AddEntity(App->entityManager->player->Town_center);
-				}
+	
 			}
 			else {
 				if ((buildingType)buildingNode.child("Type").attribute("value").as_int() == SAURON_TOWER)
 				{
-					if (AI_faction->Town_center->Life <= 0) {
-						Building* buildingTemplate = App->entityManager->CreateBuilding(buildingNode.child("Position").attribute("x").as_int(),
-							buildingNode.child("Position").attribute("y").as_int(),
-							(buildingType)buildingNode.child("Type").attribute("value").as_int());
-						buildingTemplate->Life = buildingNode.child("Life").attribute("value").as_int();
-						buildingTemplate->state = (EntityState)buildingNode.child("State").attribute("value").as_int();
-						buildingTemplate->entityID = buildingNode.child("ID").attribute("value").as_int();
-						AI_faction->Town_center = buildingTemplate;
-					}
-					else {
-						AI_faction->Town_center->Life = buildingNode.child("Life").attribute("value").as_int();
-						AI_faction->Town_center->state = (EntityState)buildingNode.child("State").attribute("value").as_int();
-						App->entityManager->WorldEntityList.push_back(AI_faction->Town_center);
-						App->fog->AddEntity(App->entityManager->AI_faction->Town_center);
-					}
+				
 				}
 			
 			}
@@ -497,77 +241,24 @@ bool EntityManager::Load(pugi::xml_node & data)
 
 	// FACTIONS
 
-	player->resources.wood = data.child("Player").attribute("wood").as_int();
-	player->resources.gold = data.child("Player").attribute("gold").as_int();
-	player->resources.food = data.child("Player").attribute("food").as_int();
-	player->resources.stone = data.child("Player").attribute("stone").as_int();
-
-	player->faction = FREE_MEN;
-	player->tech_tree->Reset(FREE_MEN);
-	
-	player->tech_tree->available_techs.clear();
-	for (pugi::xml_attribute available_techs = data.child("Player").child("TechTree").child("AvailableTechs").attribute("TechType");
-	available_techs; available_techs = available_techs.next_attribute())
-	{
-		player->tech_tree->available_techs.push_back((TechType)available_techs.as_int());
-	}
-	player->tech_tree->available_buildings.clear();
 
 	for (pugi::xml_attribute available_buildings = data.child("Player").child("TechTree").child("AvailableBuildings").attribute("BuildingType");
 	available_buildings; available_buildings = available_buildings.next_attribute())
 	{
-		player->tech_tree->available_buildings.push_back((buildingType)available_buildings.as_int());
+		//player->tech_tree->available_buildings.push_back((buildingType)available_buildings.as_int());
 	}
-	player->tech_tree->available_units.clear();
+	//player->tech_tree->available_units.clear();
 	for (pugi::xml_node available_units = data.child("Player").child("TechTree").child("AvailableUnits").child("Unit");
 	available_units; available_units = available_units.next_sibling("Unit"))
 	{
 		pair<unitType, buildingType> element = { (unitType)available_units.attribute("UnitType").as_int(), (buildingType)available_units.attribute("BuildingType").as_int() };
-		player->tech_tree->available_units.push_back(element);
+		//player->tech_tree->available_units.push_back(element);
 	}
-	player->tech_tree->multiplier_list.clear();
+	//player->tech_tree->multiplier_list.clear();
 	for (pugi::xml_node multipliers = data.child("Player").child("Multipliers"); multipliers; multipliers = multipliers.next_sibling("Multipliers"))
 	{
-		player->tech_tree->multiplier_list.push_back(multipliers.attribute("Multiplier").as_float());
+		//player->tech_tree->multiplier_list.push_back(multipliers.attribute("Multiplier").as_float());
 	}
-
-	AI_faction->resources.wood = data.child("Enemy").attribute("wood").as_int();
-	AI_faction->resources.gold = data.child("Enemy").attribute("gold").as_int();
-	AI_faction->resources.food = data.child("Enemy").attribute("food").as_int();
-	AI_faction->resources.stone = data.child("Enemy").attribute("stone").as_int();
-
-	AI_faction->faction = SAURON_ARMY;
-	AI_faction->tech_tree->Reset(SAURON_ARMY);
-
-	AI_faction->tech_tree->available_techs.clear();
-	for (pugi::xml_attribute available_techs = data.child("Enemy").child("TechTree").child("AvailableTechs").attribute("TechType");
-	available_techs; available_techs = available_techs.next_attribute())
-	{
-		AI_faction->tech_tree->available_techs.push_back((TechType)available_techs.as_int());
-	}
-	AI_faction->tech_tree->available_buildings.clear();
-	for (pugi::xml_attribute available_buildings = data.child("Enemy").child("TechTree").child("AvailableBuildings").attribute("BuildingType");
-	available_buildings; available_buildings = available_buildings.next_attribute())
-	{
-		AI_faction->tech_tree->available_buildings.push_back((buildingType)available_buildings.as_int());
-	}
-	AI_faction->tech_tree->available_units.clear();
-	for (pugi::xml_node available_units = data.child("Enemy").child("TechTree").child("AvailableUnits").child("Unit");
-	available_units; available_units = available_units.next_sibling("Unit"))
-	{
-		pair<unitType, buildingType> element = { (unitType)available_units.attribute("UnitType").as_int(), (buildingType)available_units.attribute("BuildingType").as_int() };
-		AI_faction->tech_tree->available_units.push_back(element);
-	}
-	AI_faction->tech_tree->multiplier_list.clear();
-	for (pugi::xml_node multipliers = data.child("Enemy").child("Multipliers"); multipliers; multipliers = multipliers.next_sibling("Multipliers"))
-	{
-		AI_faction->tech_tree->multiplier_list.push_back(multipliers.attribute("Multiplier").as_float());
-	}
-
-	App->sceneManager->level1_scene->UpdateResources();
-
-	placingBuilding = data.child("BuildingCreation").attribute("PlacingBuilding").as_bool();
-	placing_type = (buildingType)data.child("BuildingCreation").attribute("BuildingType").as_int();
 
 	return true;
 }
@@ -584,7 +275,7 @@ bool EntityManager::Save(pugi::xml_node & data) const
 
 	// -------------- FRIENDLY UNITS ------------
 
-	for (list<Unit*>::iterator it = App->entityManager->player->units.begin(); it != App->entityManager->player->units.end(); it++) {
+	/*for (list<Unit*>::iterator it = App->entityManager->player->units.begin(); it != App->entityManager->player->units.end(); it++) {
 		if ((*it)->state != DESTROYED) {
 
 			pugi::xml_node unitNodeInfo = data.append_child("Unit");
@@ -759,7 +450,7 @@ bool EntityManager::Save(pugi::xml_node & data) const
 
 	create.append_attribute("PlacingBuilding") = placingBuilding;
 	create.append_attribute("BuildingType") = placing_type;
-
+	*/
 	return true;
 }
 
@@ -1015,9 +706,9 @@ bool EntityManager::LoadGameData()
 			resourcesDB.insert(pair<int, Resource*>(resourceTemplate->res_type, resourceTemplate));
 		}
 
-		player->tech_tree->LoadTechTree(gameData.child("FPTechs"));
+		/*player->tech_tree->LoadTechTree(gameData.child("FPTechs"));
 		App->gui->LoadTechInfo();
-		AI_faction->tech_tree->LoadTechTree(gameData.child("SATechs"));
+		AI_faction->tech_tree->LoadTechTree(gameData.child("SATechs"));*/
 	}
 
 	return ret;
@@ -1025,9 +716,9 @@ bool EntityManager::LoadGameData()
 
 Unit* EntityManager::CreateUnit(int posX, int posY, unitType type)
 {
-	Unit* unit;
+	Unit* unit = nullptr;
 
-	if (type == SLAVE_VILLAGER || type == ELF_VILLAGER) {
+	/*if (type == SLAVE_VILLAGER || type == ELF_VILLAGER) {
 		unit = (Unit*) new Villager(posX, posY, (Villager*)unitsDB[type]);
 
 		if (unit->faction == player->faction)
@@ -1066,14 +757,14 @@ Unit* EntityManager::CreateUnit(int posX, int posY, unitType type)
 
 	WorldEntityList.push_back(unit);
 	App->fog->AddEntity(unit);
-
+	*/
 	return unit;
 }
 
 
 Building* EntityManager::CreateBuilding(int posX, int posY,  buildingType type)
 {
-	Building* building = new Building(posX, posY, buildingsDB[type]);
+	/*Building* building = new Building(posX, posY, buildingsDB[type]);
 	building->entityID = nextID;
 	nextID++;
 	if (building->faction == player->faction)
@@ -1084,7 +775,8 @@ Building* EntityManager::CreateBuilding(int posX, int posY,  buildingType type)
 	WorldEntityList.push_back(building);
 
 	App->fog->AddEntity(building);
-	return building;
+	return building;*/
+	return nullptr;
 }
 
 Resource* EntityManager::CreateResource(int posX, int posY, resourceItem item)
@@ -1112,7 +804,7 @@ void EntityManager::DeleteEntity(Entity* entity)
 
 
 void EntityManager::AddResources(Villager* villager) {
-
+/*
 	StoredResources* resources = nullptr;
 	if (villager->faction == player->faction)
 		resources = &player->resources;
@@ -1134,7 +826,7 @@ void EntityManager::AddResources(Villager* villager) {
 		App->sceneManager->level1_scene->UpdateResources();
 
 	villager->curr_capacity = 0;
-
+	*/
 }
 
 Resource* EntityManager::FindNearestResource(resourceType contains, iPoint pos) {
@@ -1157,7 +849,7 @@ Resource* EntityManager::FindNearestResource(resourceType contains, iPoint pos) 
 
 void EntityManager::RallyCall(Entity* entity) {
 
-	list<Unit*>* allied_units = nullptr;
+	/*list<Unit*>* allied_units = nullptr;
 	if (entity == nullptr) return;
 
 	if (entity->faction == player->faction)
@@ -1190,13 +882,13 @@ void EntityManager::RallyCall(Entity* entity) {
 
 		}
 	}
-	
+	*/
 }
 
 
 Building* EntityManager::FindNearestBuilding(Unit* unit) {
 
-	list<Building*>* ally_buildings = nullptr;
+	/*list<Building*>* ally_buildings = nullptr;
 	Building* ret = nullptr;
 
 	if (unit->faction == player->faction)
@@ -1212,12 +904,13 @@ Building* EntityManager::FindNearestBuilding(Unit* unit) {
 		}
 	}
 
-	return ret;
+	return ret;*/
+	return nullptr;
 }
 
 Entity* EntityManager::FindTarget(Entity* entity) {
 
-	list<Unit*>* enemy_units = nullptr;
+	/*list<Unit*>* enemy_units = nullptr;
 	Entity* ret = nullptr;
 	iPoint aux{ -1,-1 };
 
@@ -1253,13 +946,14 @@ Entity* EntityManager::FindTarget(Entity* entity) {
 		}
 	}
 
-	return ret;
+	return ret;*/
+	return nullptr;
 }
 
 
 void EntityManager::DestroyEntity(Entity* entity)
 {
-	if (entity != nullptr) {
+	/*if (entity != nullptr) {
 		list<Entity*>::iterator it = removeEntityList.begin();
 
 		while (it != removeEntityList.end())
@@ -1272,12 +966,12 @@ void EntityManager::DestroyEntity(Entity* entity)
 			}
 			++it;
 		}
-	}
+	}*/
 }
 
 Collider* EntityManager::CheckCursorHover(iPoint cursor_pos) {
 
-	Collider* nearest_col = nullptr;
+	/*Collider* nearest_col = nullptr;
 
 	if(nearest_col = App->collision->FindCollider(cursor_pos, 5)){
 
@@ -1295,12 +989,13 @@ Collider* EntityManager::CheckCursorHover(iPoint cursor_pos) {
 	else
 		 cursor_hover = HOVERING_TERRAIN;
 
-	return nearest_col;
+	return nearest_col;*/
+	return nullptr;
 }
 
 void EntityManager::FillSelectedList() {
 
-	selectedEntityList.clear();
+	/*selectedEntityList.clear();
 
 	if (multiSelectionRect.w == 0 && multiSelectionRect.h == 0) {   // if there's no selection rect... (only clicked)
 
@@ -1387,7 +1082,7 @@ void EntityManager::FillSelectedList() {
 			App->audio->PlaySelectSound((Unit*)selectedEntityList.front());
 	}
 
-	multiSelectionRect = { 0,0,0,0 };
+	multiSelectionRect = { 0,0,0,0 };*/
 }
 
 void EntityManager::DrawSelectedList() {

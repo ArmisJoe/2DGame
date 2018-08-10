@@ -9,7 +9,6 @@
 #include "SceneManager.h"
 #include "FileSystem.h"
 #include "Map.h"
-#include "Pathfinding.h"
 #include "Fonts.h"
 #include "ParticleManager.h"
 #include "Application.h"
@@ -18,10 +17,8 @@
 #include "Collision.h"
 #include "Gui.h"
 #include "FogOfWar.h"
-#include "AI.h"
 #include "Minimap.h"
 #include "QuestManager.h"
-#include "CutSceneManager.h"
 
 
 // Constructor
@@ -37,17 +34,14 @@ Application::Application(int argc, char* args[]) : argc(argc), args(args)
 	sceneManager = new SceneManager();
 	fs = new FileSystem();
 	map = new Map();
-	pathfinding = new PathFinding();
 	font = new Fonts();
 	particlemanager = new ParticleManager();
 	entityManager = new EntityManager();
 	collision = new Collision();
 	gui = new Gui();
 	fog = new FogOfWar();
-	ai = new AI();
 	minimap = new Minimap();
 	quest = new QuestManager();
-	cutscene = new CutSceneManager();
 
 	// Ordered for awake / Start / Update
 	// Reverse order of CleanUp
@@ -57,12 +51,9 @@ Application::Application(int argc, char* args[]) : argc(argc), args(args)
 	AddModule(tex);
 	AddModule(audio);
 	AddModule(map);
-	AddModule(pathfinding);
 	AddModule(font);
 	AddModule(particlemanager);
 	AddModule(gui);
-	AddModule(ai);
-	AddModule(cutscene);
 
 	// scene last
 	AddModule(sceneManager);
